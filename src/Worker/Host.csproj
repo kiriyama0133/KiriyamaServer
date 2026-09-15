@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Genocs.Logging" Version="9.0.0" />
+        <PackageReference Include="Genocs.Logging" Version="9.0.2" />
         <PackageReference Include="Genocs.Telemetry" Version="9.0.0" />
     </ItemGroup>
 
