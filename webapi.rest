@@ -1,0 +1,82 @@
+###############################################################################
+# Use this file inside Visual Studio code with 'REST Client' plugin 
+# https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+###############################################################################
+
+@web_api_root_url = https://localhost:5001
+
+@apiVersion = v1
+
+@refreshToken = YOUR_REFRESH_TOKEN_HERE
+
+
+### Register a new customer
+# @name createCustomer
+POST {{web_api_root_url}}/api/{{apiVersion}}/customers
+Content-Type: application/json
+
+{
+  "SSN": "241019681234",
+  "Name": "Giovanni",
+  "InitialAmount": 1000
+}
+
+### Get Customer details
+@customerId = {{createCustomer.response.body.$.customerId}}
+GET {{web_api_root_url}}/api/{{apiVersion}}/customers/{{customerId}}
+Content-Type: application/json
+
+
+###############################################################################
+# 房间大厅 + UDP 中继（Room Lobby & UDP Relay）
+# 路由不带版本前缀，与客户端 IRelayServerClient 协议对齐。
+###############################################################################
+
+### 列出所有房间
+GET {{web_api_root_url}}/api/rooms
+
+### 创建一个房间（无密码）
+POST {{web_api_root_url}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": "文明6 联机房",
+  "hostName": "kiriyama0133",
+  "maxPlayers": 4
+}
+
+### 创建一个房间（带密码）
+POST {{web_api_root_url}}/api/rooms
+Content-Type: application/json
+
+{
+  "name": "私人房",
+  "hostName": "kiriyama0133",
+  "password": "secret123",
+  "maxPlayers": 4
+}
+
+### 加入房间（无密码房间，虚拟 IP 填本机 ZeroTier 节点 IP）
+# @name joinRoom
+POST {{web_api_root_url}}/api/rooms/ABC123/join
+Content-Type: application/json
+
+{
+  "nickname": "player2",
+  "virtualIp": "10.99.38.38"
+}
+
+### 加入房间（带密码）
+POST {{web_api_root_url}}/api/rooms/ABC123/join
+Content-Type: application/json
+
+{
+  "nickname": "player2",
+  "virtualIp": "10.99.38.38",
+  "password": "secret123"
+}
+
+### 离开房间
+@playerId = {{joinRoom.response.body.$.playerId}}
+POST {{web_api_root_url}}/api/rooms/ABC123/leave?playerId={{playerId}}
+

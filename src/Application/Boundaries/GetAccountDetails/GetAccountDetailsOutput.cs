@@ -1,0 +1,63 @@
+using KiriyamaServer.Application.Interfaces;
+using KiriyamaServer.Domain.Accounts;
+
+namespace KiriyamaServer.Application.Boundaries.GetAccountDetails;
+
+public sealed class GetAccountDetailsOutput : IOutputType
+{
+    public Guid AccountId { get; }
+    public decimal CurrentBalance { get; }
+    public List<Transaction> Transactions { get; }
+
+    public GetAccountDetailsOutput(Guid accountId, decimal currentBalance, List<Transaction> transactions)
+    {
+        AccountId = accountId;
+        CurrentBalance = currentBalance;
+        Transactions = transactions;
+    }
+
+    public GetAccountDetailsOutput(IAccount account)
+    {
+        var accountEntity = (Account)account;
+
+        AccountId = accountEntity.Id;
+        CurrentBalance = accountEntity
+            .GetCurrentBalance()
+            .ToDecimal();
+
+        List<Transaction> transactionResults = [];
+        foreach (var credit in accountEntity.Credits
+                .GetTransactions())
+        {
+            Credit creditEntity = (Credit)credit;
+
+            Transaction transactionOutput = new Transaction(
+                Credit.Description,
+                creditEntity
+                .Amount
+                .ToMoney()
+                .ToDecimal(),
+                creditEntity.TransactionDate);
+
+            transactionResults.Add(transactionOutput);
+        }
+
+        foreach (var debit in accountEntity.Debits
+                .GetTransactions())
+        {
+            Debit debitEntity = (Debit)debit;
+
+            Transaction transactionOutput = new Transaction(
+                Debit.Description,
+                debitEntity
+                .Amount
+                .ToMoney()
+                .ToDecimal(),
+                debitEntity.TransactionDate);
+
+            transactionResults.Add(transactionOutput);
+        }
+
+        Transactions = transactionResults;
+    }
+}

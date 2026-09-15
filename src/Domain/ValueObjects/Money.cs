@@ -1,0 +1,66 @@
+namespace KiriyamaServer.Domain.ValueObjects;
+
+public sealed class Money(decimal value) : IEquatable<Money>
+{
+    private readonly decimal _money = value;
+
+    public decimal Value => _money;
+
+    public decimal ToDecimal()
+    {
+        return _money;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+
+        if (ReferenceEquals(null, obj))
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj is decimal)
+        {
+            return (decimal)obj == _money;
+        }
+
+        return ((Money)obj)._money == _money;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(_money);
+    }
+
+    internal bool LessThan(PositiveMoney amount)
+    {
+        return _money < amount.ToMoney()._money;
+    }
+
+    internal bool IsZero()
+    {
+        return _money == 0;
+    }
+
+    public bool Equals(Money? other)
+    {
+        if (other is null) return false;
+        return _money == other._money;
+    }
+
+    internal PositiveMoney Add(Money value)
+    {
+        return new PositiveMoney(_money + value.ToDecimal());
+    }
+
+    internal Money Subtract(Money value)
+    {
+        return new Money(_money - value.ToDecimal());
+    }
+}

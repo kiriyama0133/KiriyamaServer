@@ -1,0 +1,56 @@
+using KiriyamaServer.Domain.Exceptions;
+
+namespace KiriyamaServer.Domain.ValueObjects;
+
+public sealed class Name : IEquatable<Name>
+{
+    private readonly string _text;
+
+    public string Value => _text;
+
+    public Name(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            throw new NameShouldNotBeEmptyException("The 'Name' field is required");
+
+        _text = text;
+    }
+
+    public override string ToString()
+    {
+        return _text;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is null) return false;
+
+        if (obj is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj is string)
+        {
+            return obj.ToString() == _text;
+        }
+
+        return ((Name)obj)._text == _text;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(_text);
+    }
+
+    public bool Equals(Name? other)
+    {
+        if (other is null) return false;
+        return _text == other._text;
+    }
+}

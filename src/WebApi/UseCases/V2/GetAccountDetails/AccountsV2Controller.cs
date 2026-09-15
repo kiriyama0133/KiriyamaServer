@@ -1,0 +1,34 @@
+using Asp.Versioning;
+using KiriyamaServer.Application.Boundaries.GetAccountDetails;
+using KiriyamaServer.Application.Interfaces;
+using KiriyamaServer.WebApi.Extensions.FeatureFlags;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.FeatureManagement.Mvc;
+using System.ComponentModel.DataAnnotations;
+
+namespace KiriyamaServer.WebApi.UseCases.V2.GetAccountDetails;
+
+[FeatureGate(Features.GetAccountDetailsV2)]
+[ApiVersion("2.0")]
+[Route("api/v2/[controller]")]
+[ApiController]
+public sealed class AccountsV2Controller(IUseCase<GetAccountDetailsInput> getAccountDetailsUseCase, GetAccountDetailsPresenterV2 presenter) : ControllerBase
+{
+    private readonly IUseCase<GetAccountDetailsInput> _getAccountDetailsUseCase = getAccountDetailsUseCase;
+    private readonly GetAccountDetailsPresenterV2 _presenter = presenter;
+
+    /// <summary>
+    /// GetAsync an account details.
+    /// </summary>
+    [HttpGet("{AccountId}", Name = "GetAccountV2")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult?> GetAsync([FromRoute][Required] GetAccountDetailsRequestV2 request)
+    {
+        var getAccountDetailsInput = new GetAccountDetailsInput(request.AccountId);
+        await _getAccountDetailsUseCase.ExecuteAsync(getAccountDetailsInput);
+        return _presenter.ViewModel;
+    }
+}

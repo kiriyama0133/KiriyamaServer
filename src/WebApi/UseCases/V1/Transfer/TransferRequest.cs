@@ -1,0 +1,27 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace KiriyamaServer.WebApi.UseCases.V1.Transfer;
+
+/// <summary>
+/// Transfer Request.
+/// </summary>
+public sealed class TransferRequest
+{
+    /// <summary>
+    /// Origin Account ID.
+    /// </summary>
+    [Required]
+    public Guid OriginAccountId { get; set; }
+
+    /// <summary>
+    /// Destination Account ID.
+    /// </summary>
+    [Required]
+    public Guid DestinationAccountId { get; set; }
+
+    /// <summary>
+    /// Amount Transferred.
+    /// </summary>
+    [Required]
+    public decimal Amount { get; set; }
+}

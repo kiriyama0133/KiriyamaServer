@@ -1,0 +1,9 @@
+<Project>
+    <PropertyGroup>
+        <DocumentationFile>$(OutputPath)$(AssemblyName).xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <DefineConstants>TRACE;__Full__;Full;CloseAccount;Deposit;GetAccountDetails;Refund;GetCustomerDetails;Register;Withdraw;Transfer</DefineConstants>
+    </PropertyGroup>
+</Project>

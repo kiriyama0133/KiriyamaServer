@@ -1,0 +1,41 @@
+using KiriyamaServer.Application.Boundaries.Registers;
+using KiriyamaServer.Application.UseCases;
+using KiriyamaServer.Domain.ValueObjects;
+using KiriyamaServer.Infrastructure.PersistenceLayer.Presenters;
+using Xunit;
+
+namespace KiriyamaServer.UnitTests.UseCaseTests.Registers;
+
+public sealed class RegisterTests(TestFixture fixture) : IClassFixture<TestFixture>
+{
+    private readonly TestFixture _fixture = fixture;
+
+    [Theory]
+    [ClassData(typeof(PositiveDataSetup))]
+    public async Task RegisterWritesOutputInputIsValidAsync(decimal amount)
+    {
+        var presenter = new RegisterPresenter();
+        var ssn = new SSN("8608178888");
+        var name = new Name("Nocco Giovanni Emanuele");
+
+        var sut = new Register(
+            _fixture.EntityFactory,
+            presenter,
+            _fixture.CustomerRepository,
+            _fixture.AccountRepository,
+            _fixture.UnitOfWork,
+            _fixture.ServiceBus);
+
+        await sut.ExecuteAsync(new RegisterInput(
+            ssn,
+            name,
+            new PositiveMoney(amount)));
+
+        var actual = presenter.Registers.Last();
+
+        Assert.NotNull(actual);
+        Assert.Equal(ssn.ToString(), actual.Customer.SSN);
+        Assert.Equal(name.ToString(), actual.Customer.Name);
+        Assert.Equal(amount, actual.Account.CurrentBalance);
+    }
+}

@@ -1,0 +1,36 @@
+using Asp.Versioning;
+using KiriyamaServer.Application.Boundaries.Withdraws;
+using KiriyamaServer.Application.Interfaces;
+using KiriyamaServer.Domain.ValueObjects;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+
+namespace KiriyamaServer.WebApi.UseCases.V1.Withdraw;
+
+[ApiVersion("1.0")]
+[Route("api/v1/[controller]")]
+[ApiController]
+public sealed class AccountsController(IUseCase<WithdrawInput> withdrawUseCase, WithdrawPresenter presenter) : ControllerBase
+{
+    private readonly IUseCase<WithdrawInput> _withdrawUseCase = withdrawUseCase;
+    private readonly WithdrawPresenter _presenter = presenter;
+
+    /// <summary>
+    /// Withdraw on an account.
+    /// </summary>
+    /// <response code="200">The updated balance.</response>
+    /// <response code="400">Bad request.</response>
+    /// <response code="500">Error.</response>
+    /// <param name="request">The request to Withdraw.</param>
+    /// <returns>The updated balance.</returns>
+    [HttpPatch("Withdraw")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(WithdrawResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult?> WithdrawAsync([FromBody][Required] WithdrawRequest request)
+    {
+        var withdrawInput = new WithdrawInput(request.AccountId, new PositiveMoney(request.Amount));
+        await _withdrawUseCase.ExecuteAsync(withdrawInput);
+        return _presenter.ViewModel;
+    }
+}
