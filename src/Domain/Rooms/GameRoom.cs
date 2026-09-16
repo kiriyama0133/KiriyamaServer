@@ -87,9 +87,15 @@ public sealed class GameRoom
         return Password.Verify(plainText ?? string.Empty);
     }
 
-    /// <summary>让一名玩家加入房间。房间满则抛领域异常。</summary>
+    /// <summary>
+    /// 让一名玩家加入房间。同一节点（NodeId）重复加入时刷新原记录而不是新增，
+    /// 保证一个节点在房间里只占一个名额（上次 leave 丢失或 join 重试不会产生重复成员）。
+    /// 房间满则抛领域异常（自己的旧记录会先腾出名额，重进不受影响）。
+    /// </summary>
     public Player Join(string nickname, string nodeId, string virtualIp)
     {
+        RemoveByNodeId(nodeId);
+
         if (IsFull)
         {
             throw new DomainException("The room is full.");
@@ -100,16 +106,14 @@ public sealed class GameRoom
         return player;
     }
 
-    /// <summary>让一名玩家离开房间。</summary>
-    public Player? Leave(Guid playerId)
-    {
-        Player? player = _players.FirstOrDefault(p => p.Id == playerId);
-        if (player is not null)
-        {
-            _players.Remove(player);
-        }
+    /// <summary>让指定节点的所有成员记录离开房间（历史重复加入可能遗留多条）。返回移除的数量。</summary>
+    public int LeaveByNodeId(string nodeId) => RemoveByNodeId(nodeId);
 
-        return player;
+    /// <summary>移除指定节点的全部成员记录，返回移除数量。</summary>
+    private int RemoveByNodeId(string nodeId)
+    {
+        return _players.RemoveAll(p =>
+            string.Equals(p.NodeId, nodeId.Trim(), StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>房间是否为空（无任何玩家）。</summary>

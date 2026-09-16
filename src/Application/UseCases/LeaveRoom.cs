@@ -2,7 +2,6 @@ using KiriyamaServer.Application.Boundaries.Rooms;
 using KiriyamaServer.Application.Interfaces;
 using KiriyamaServer.Application.Repositories;
 using KiriyamaServer.Application.Services;
-using KiriyamaServer.Domain.Rooms;
 
 namespace KiriyamaServer.Application.UseCases;
 
@@ -26,14 +25,13 @@ public sealed class LeaveRoom(IRoomRepository roomRepository, IZeroTierControlle
             return;
         }
 
-        Player? player = room.Players.FirstOrDefault(p => string.Equals(p.NodeId, input.NodeId, StringComparison.OrdinalIgnoreCase));
-        if (player is null)
+        // 按节点移除该玩家的全部成员记录（历史重复加入可能遗留多条，一次清光）。
+        int removed = room.LeaveByNodeId(input.NodeId);
+        if (removed == 0)
         {
             _outputPort.NotFound();
             return;
         }
-
-        room.Leave(player.Id);
 
         bool roomClosed = room.IsEmpty;
         if (roomClosed)
@@ -42,7 +40,7 @@ public sealed class LeaveRoom(IRoomRepository roomRepository, IZeroTierControlle
         }
 
         // 清除该节点的房间 Tag，使其退出房间的流量范围。
-        await _zeroTierController.ClearRoomTagAsync(player.NodeId, cancellationToken);
+        await _zeroTierController.ClearRoomTagAsync(input.NodeId, cancellationToken);
 
         _outputPort.Standard(new LeaveRoomOutput(roomClosed));
     }
