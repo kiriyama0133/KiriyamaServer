@@ -23,6 +23,8 @@ public sealed class RoomsController : ControllerBase
     private readonly JoinRoomPresenter _joinRoomPresenter;
     private readonly IUseCase<LeaveRoomInput> _leaveRoomUseCase;
     private readonly LeaveRoomPresenter _leaveRoomPresenter;
+    private readonly IUseCase<ListPlayersInput> _listPlayersUseCase;
+    private readonly ListPlayersPresenter _listPlayersPresenter;
 
     public RoomsController(
         IUseCase<ListRoomsInput> listRoomsUseCase,
@@ -32,7 +34,9 @@ public sealed class RoomsController : ControllerBase
         IUseCase<JoinRoomInput> joinRoomUseCase,
         JoinRoomPresenter joinRoomPresenter,
         IUseCase<LeaveRoomInput> leaveRoomUseCase,
-        LeaveRoomPresenter leaveRoomPresenter)
+        LeaveRoomPresenter leaveRoomPresenter,
+        IUseCase<ListPlayersInput> listPlayersUseCase,
+        ListPlayersPresenter listPlayersPresenter)
     {
         _listRoomsUseCase = listRoomsUseCase;
         _listRoomsPresenter = listRoomsPresenter;
@@ -42,6 +46,8 @@ public sealed class RoomsController : ControllerBase
         _joinRoomPresenter = joinRoomPresenter;
         _leaveRoomUseCase = leaveRoomUseCase;
         _leaveRoomPresenter = leaveRoomPresenter;
+        _listPlayersUseCase = listPlayersUseCase;
+        _listPlayersPresenter = listPlayersPresenter;
     }
 
     /// <summary>列出房间；可通过 game 查询参数按游戏板块过滤。</summary>
@@ -94,5 +100,17 @@ public sealed class RoomsController : ControllerBase
         var input = new LeaveRoomInput(RoomId.From(roomId), request.NodeId);
         await _leaveRoomUseCase.ExecuteAsync(input, cancellationToken);
         return _leaveRoomPresenter.ViewModel;
+    }
+
+    /// <summary>列出房间内的玩家（客户端房间页面展示成员与做延迟探测）。</summary>
+    [HttpGet("{roomId}/players")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult?> ListPlayersAsync([FromRoute][Required] string roomId, CancellationToken cancellationToken = default)
+    {
+        var input = new ListPlayersInput(RoomId.From(roomId));
+        await _listPlayersUseCase.ExecuteAsync(input, cancellationToken);
+        return _listPlayersPresenter.ViewModel;
     }
 }

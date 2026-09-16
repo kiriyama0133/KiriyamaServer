@@ -1,0 +1,12 @@
+﻿F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\UseCases\Auth\AuthController.cs(63,48): warning SA1629: Documentation text should end with a period (https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1629.md) [F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\Host.csproj]
+F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\UseCases\Rooms\RoomsController.cs(53,44): warning SA1629: Documentation text should end with a period (https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1629.md) [F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\Host.csproj]
+F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\UseCases\Rooms\RoomsController.cs(67,25): warning SA1629: Documentation text should end with a period (https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1629.md) [F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\Host.csproj]
+F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\UseCases\Rooms\RoomsController.cs(79,48): warning SA1629: Documentation text should end with a period (https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1629.md) [F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\Host.csproj]
+F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\UseCases\Rooms\RoomsController.cs(93,42): warning SA1629: Documentation text should end with a period (https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1629.md) [F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\Host.csproj]
+F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\UseCases\Rooms\RoomsController.cs(105,46): warning SA1629: Documentation text should end with a period (https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1629.md) [F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\Host.csproj]
+F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\Program.cs(135,5): warning ASP0014: Suggest using top level route registrations instead of UseEndpoints (https://aka.ms/aspnet/analyzers) [F:\KiriyamaLauncher\KiriyamaServer\src\WebApi\Host.csproj]
+    265 涓鍛?
+    0 涓敊璇?
+
+宸茬敤鏃堕棿 00:00:32.57
+

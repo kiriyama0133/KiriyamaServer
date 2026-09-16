@@ -35,6 +35,6 @@ public sealed class Login(
 
         await _userRepository.UpdateAsync(user, cancellationToken);
 
-        _outputPort.Standard(new LoginOutput(code, expiresAt));
+        _outputPort.Standard(new LoginOutput(code, expiresAt, user.DisplayName));
     }
 }

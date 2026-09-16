@@ -22,6 +22,15 @@ StaticLogger.EnsureInitialized();
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 显式监听所有网卡（0.0.0.0），端口从配置读取、默认 5000。
+// 默认的 Kestrel 只绑定 http://localhost:5000（回环），部署到 Linux 后
+// 客户端通过 ZeroTier 虚拟 IP / 局域网 IP 访问会被拒之门外（表现为连接被重置）。
+builder.WebHost.ConfigureKestrel(options =>
+{
+    int port = builder.Configuration.GetValue<int>("Kestrel:Port", 5000);
+    options.ListenAnyIP(port);
+});
+
 builder.Host
         .UseLogging();
 

@@ -50,6 +50,7 @@ public static class RoomsExtensions
         services.AddScoped<IUseCase<CreateRoomInput>, CreateRoom>();
         services.AddScoped<IUseCase<JoinRoomInput>, JoinRoom>();
         services.AddScoped<IUseCase<LeaveRoomInput>, LeaveRoom>();
+        services.AddScoped<IUseCase<ListPlayersInput>, ListPlayers>();
 
         // Presenter。
         services.AddScoped<ListRoomsPresenter>();
@@ -60,6 +61,8 @@ public static class RoomsExtensions
         services.AddScoped<IJoinRoomOutputPort>(sp => sp.GetRequiredService<JoinRoomPresenter>());
         services.AddScoped<LeaveRoomPresenter>();
         services.AddScoped<ILeaveRoomOutputPort>(sp => sp.GetRequiredService<LeaveRoomPresenter>());
+        services.AddScoped<ListPlayersPresenter>();
+        services.AddScoped<IListPlayersOutputPort>(sp => sp.GetRequiredService<ListPlayersPresenter>());
 
         return services;
     }

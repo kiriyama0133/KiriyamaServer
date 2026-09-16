@@ -19,6 +19,6 @@ public sealed class LoginPresenter : ILoginOutputPort
 
     public void Standard(LoginOutput output)
     {
-        ViewModel = new OkObjectResult(new { output.Code, output.ExpiresAt });
+        ViewModel = new OkObjectResult(new { output.Code, output.ExpiresAt, output.DisplayName });
     }
 }
