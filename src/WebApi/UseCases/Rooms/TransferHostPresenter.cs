@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KiriyamaServer.WebApi.UseCases.Rooms;
 
-/// <summary>列出房间内玩家用例的 Presenter。</summary>
-public sealed class ListPlayersPresenter : IListPlayersOutputPort
+/// <summary>转让房主用例的 Presenter。</summary>
+public sealed class TransferHostPresenter : ITransferHostOutputPort
 {
     public IActionResult? ViewModel { get; private set; }
 
@@ -26,18 +26,26 @@ public sealed class ListPlayersPresenter : IListPlayersOutputPort
         });
     }
 
-    public void Standard(ListPlayersOutput output)
+    public void Forbidden(string message)
     {
-        var players = output.Players
-            .Select(p => new PlayerDto(p.PlayerId, p.Nickname, p.NodeId, p.VirtualIp, p.IsHost))
-            .ToList();
+        ViewModel = new ObjectResult(new ProblemDetails
+        {
+            Title = "Forbidden",
+            Detail = message,
+            Status = StatusCodes.Status403Forbidden
+        })
+        {
+            StatusCode = StatusCodes.Status403Forbidden
+        };
+    }
 
+    public void Standard(TransferHostOutput output)
+    {
         ViewModel = new OkObjectResult(new
         {
             roomId = output.RoomId,
-            roomName = output.RoomName,
-            hostNodeId = output.HostNodeId,
-            players
+            hostName = output.HostName,
+            hostNodeId = output.HostNodeId
         });
     }
 }

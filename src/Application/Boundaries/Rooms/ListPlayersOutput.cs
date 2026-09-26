@@ -17,12 +17,16 @@ public sealed class PlayerInfo
     /// <summary>玩家在虚拟网中的 IP（客户端用它做延迟探测）。</summary>
     public string VirtualIp { get; }
 
-    public PlayerInfo(Guid playerId, string nickname, string nodeId, string virtualIp)
+    /// <summary>该玩家是不是当前房主（客户端据此显示房主标识与转让入口）。</summary>
+    public bool IsHost { get; }
+
+    public PlayerInfo(Guid playerId, string nickname, string nodeId, string virtualIp, bool isHost)
     {
         PlayerId = playerId;
         Nickname = nickname;
         NodeId = nodeId;
         VirtualIp = virtualIp;
+        IsHost = isHost;
     }
 }
 
@@ -31,12 +35,17 @@ public sealed class ListPlayersOutput : IOutputType
 {
     public string RoomId { get; }
     public string RoomName { get; }
+
+    /// <summary>房主节点 ID（客户端用它判断自己是不是房主，决定是否显示转让入口）。</summary>
+    public string HostNodeId { get; }
+
     public IReadOnlyList<PlayerInfo> Players { get; }
 
-    public ListPlayersOutput(string roomId, string roomName, IReadOnlyList<PlayerInfo> players)
+    public ListPlayersOutput(string roomId, string roomName, string hostNodeId, IReadOnlyList<PlayerInfo> players)
     {
         RoomId = roomId;
         RoomName = roomName;
+        HostNodeId = hostNodeId;
         Players = players;
     }
 }

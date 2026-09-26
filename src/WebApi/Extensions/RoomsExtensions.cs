@@ -6,6 +6,7 @@ using KiriyamaServer.Application.Services;
 using KiriyamaServer.Application.UseCases;
 using KiriyamaServer.Infrastructure.Networking;
 using KiriyamaServer.Infrastructure.PersistenceLayer.InMemory.Repositories;
+using KiriyamaServer.Infrastructure.Realtime;
 using KiriyamaServer.WebApi.UseCases.Games;
 using KiriyamaServer.WebApi.UseCases.Rooms;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +21,11 @@ public static class RoomsExtensions
     {
         // 仓储（内存实现：游戏房间是运行时临时状态）。
         services.AddSingleton<IRoomRepository, InMemoryRoomRepository>();
+
+        // 房间实时事件广播（SSE）：必须单例 —— 发布事件的是一次请求，
+        // 接收事件的是另一条长连接，两者要看到同一份订阅者集合。
+        services.AddSingleton<RoomEventHub>();
+        services.AddSingleton<IRoomEventPublisher>(sp => sp.GetRequiredService<RoomEventHub>());
 
         // 游戏目录（只读的游戏板块列表）。
         services.AddSingleton<IGameCatalog, InMemoryGameCatalog>();
@@ -51,6 +57,7 @@ public static class RoomsExtensions
         services.AddScoped<IUseCase<JoinRoomInput>, JoinRoom>();
         services.AddScoped<IUseCase<LeaveRoomInput>, LeaveRoom>();
         services.AddScoped<IUseCase<ListPlayersInput>, ListPlayers>();
+        services.AddScoped<IUseCase<TransferHostInput>, TransferHost>();
 
         // Presenter。
         services.AddScoped<ListRoomsPresenter>();
@@ -63,6 +70,8 @@ public static class RoomsExtensions
         services.AddScoped<ILeaveRoomOutputPort>(sp => sp.GetRequiredService<LeaveRoomPresenter>());
         services.AddScoped<ListPlayersPresenter>();
         services.AddScoped<IListPlayersOutputPort>(sp => sp.GetRequiredService<ListPlayersPresenter>());
+        services.AddScoped<TransferHostPresenter>();
+        services.AddScoped<ITransferHostOutputPort>(sp => sp.GetRequiredService<TransferHostPresenter>());
 
         return services;
     }

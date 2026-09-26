@@ -17,11 +17,15 @@ public sealed class PlayerDto
     [Required]
     public string VirtualIp { get; }
 
-    public PlayerDto(Guid playerId, string nickname, string nodeId, string virtualIp)
+    /// <summary>该玩家是不是房主（客户端据此显示房主标识与转让入口）。</summary>
+    public bool IsHost { get; }
+
+    public PlayerDto(Guid playerId, string nickname, string nodeId, string virtualIp, bool isHost)
     {
         PlayerId = playerId;
         Nickname = nickname;
         NodeId = nodeId;
         VirtualIp = virtualIp;
+        IsHost = isHost;
     }
 }

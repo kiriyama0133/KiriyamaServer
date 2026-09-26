@@ -21,9 +21,9 @@ public sealed class ListPlayers(IRoomRepository roomRepository, IListPlayersOutp
         }
 
         var players = room.Players
-            .Select(p => new PlayerInfo(p.Id, p.Nickname, p.NodeId, p.VirtualIp))
+            .Select(p => new PlayerInfo(p.Id, p.Nickname, p.NodeId, p.VirtualIp, room.IsHost(p.NodeId)))
             .ToList();
 
-        _outputPort.Standard(new ListPlayersOutput(room.Id.Value, room.Name, players));
+        _outputPort.Standard(new ListPlayersOutput(room.Id.Value, room.Name, room.HostNodeId, players));
     }
 }

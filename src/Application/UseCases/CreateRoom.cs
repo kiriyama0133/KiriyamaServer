@@ -29,7 +29,7 @@ public sealed class CreateRoom(IRoomRepository roomRepository, ICreateRoomOutput
             ? null
             : RoomPassword.FromPlainText(input.Password);
 
-        var room = new GameRoom(roomId, input.Name, input.HostName, input.GameKey, roomTag, password, input.MaxPlayers);
+        var room = new GameRoom(roomId, input.Name, input.HostName, input.HostNodeId, input.GameKey, roomTag, password, input.MaxPlayers);
 
         await _roomRepository.AddAsync(room, cancellationToken);
 

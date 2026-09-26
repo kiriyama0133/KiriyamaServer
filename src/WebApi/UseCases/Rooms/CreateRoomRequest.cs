@@ -13,6 +13,9 @@ public sealed class CreateRoomRequest
     [Required]
     public required string HostName { get; init; }
 
+    /// <summary>房主的 ZeroTier 节点 ID（用于转让房主与「房主退出即销毁房间」）。</summary>
+    public string? HostNodeId { get; init; }
+
     /// <summary>房间归属的游戏板块标识（如 civ6）。</summary>
     [Required]
     public required string Game { get; init; }

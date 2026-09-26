@@ -19,8 +19,14 @@ public sealed class GameRoom
     /// <summary>房间名。</summary>
     public string Name { get; }
 
-    /// <summary>房主昵称。</summary>
-    public string HostName { get; }
+    /// <summary>房主昵称（转让房主时会变，所以可变）。</summary>
+    public string HostName { get; private set; }
+
+    /// <summary>
+    /// 房主的节点 ID。房主身份以节点 ID 为准（昵称可能重名，节点 ID 唯一）。
+    /// 创建时未指定（旧客户端）则为空串，由第一个加入者认领。
+    /// </summary>
+    public string HostNodeId { get; private set; }
 
     /// <summary>房间归属的游戏板块。</summary>
     public GameKey GameKey { get; }
@@ -49,7 +55,7 @@ public sealed class GameRoom
     /// <summary>房间是否已满。</summary>
     public bool IsFull => MaxPlayers > 0 && _players.Count >= MaxPlayers;
 
-    public GameRoom(RoomId id, string name, string hostName, GameKey gameKey, RoomTag roomTag, RoomPassword? password, int maxPlayers)
+    public GameRoom(RoomId id, string name, string hostName, string hostNodeId, GameKey gameKey, RoomTag roomTag, RoomPassword? password, int maxPlayers)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -69,6 +75,10 @@ public sealed class GameRoom
         Id = id;
         Name = name.Trim();
         HostName = hostName.Trim();
+
+        // 允许为空：旧版客户端创建房间时不上报节点 ID，由第一个加入者认领房主身份。
+        HostNodeId = string.IsNullOrWhiteSpace(hostNodeId) ? string.Empty : hostNodeId.Trim();
+
         GameKey = gameKey;
         RoomTag = roomTag;
         Password = password;
@@ -103,6 +113,60 @@ public sealed class GameRoom
 
         var player = new Player(nickname, nodeId, virtualIp);
         _players.Add(player);
+
+        // 创建房间时未上报节点 ID（旧客户端）时，由第一个加入者认领房主身份。
+        if (string.IsNullOrWhiteSpace(HostNodeId))
+        {
+            HostNodeId = player.NodeId;
+            HostName = player.Nickname;
+        }
+        else if (IsHost(player.NodeId))
+        {
+            // 房主改昵称后重新加入：同步房主显示名。
+            HostName = player.Nickname;
+        }
+
+        return player;
+    }
+
+    /// <summary>判断指定节点是不是房主。</summary>
+    public bool IsHost(string nodeId)
+        => !string.IsNullOrWhiteSpace(HostNodeId)
+            && string.Equals(HostNodeId, nodeId?.Trim(), StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// 转让房主：只有当前房主可以发起，目标必须是房间内成员。
+    /// 成功返回成为新房主的玩家（房主身份按节点 ID 转移，昵称一并更新）。
+    /// </summary>
+    public Player TransferHost(string requesterNodeId, string targetNodeId)
+    {
+        if (!IsHost(requesterNodeId))
+        {
+            throw new DomainException("Only the current host can transfer ownership.");
+        }
+
+        string target = (targetNodeId ?? string.Empty).Trim();
+
+        if (target.Length == 0)
+        {
+            throw new DomainException("The target node id cannot be empty.");
+        }
+
+        Player? player = _players.FirstOrDefault(p =>
+            string.Equals(p.NodeId, target, StringComparison.OrdinalIgnoreCase));
+
+        if (player is null)
+        {
+            throw new DomainException("The target player is not in this room.");
+        }
+
+        if (IsHost(player.NodeId))
+        {
+            throw new DomainException("The target player is already the host.");
+        }
+
+        HostNodeId = player.NodeId;
+        HostName = player.Nickname;
         return player;
     }
 

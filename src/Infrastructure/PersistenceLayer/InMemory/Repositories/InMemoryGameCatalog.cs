@@ -13,6 +13,7 @@ public sealed class InMemoryGameCatalog : IGameCatalog
     private static readonly IReadOnlyList<Game> BuiltInGames = new List<Game>
     {
         new(GameKey.From("civ6"), "文明 6"),
+        new(GameKey.From("mc"), "Minecraft"),
     };
 
     public Task<IReadOnlyList<Game>> ListAsync(CancellationToken cancellationToken = default)
